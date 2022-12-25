@@ -1,0 +1,332 @@
+---
+title: "Project 2021"
+author: "Ming"
+date: "7/8/2021"
+output: html_document
+---
+
+#this model is created to show the impact of climate change in weather of Austrilia only since we use data of Austrila cities on the North, East and South.
+
+```{r}
+setwd('R')
+data <- read.csv('weatherAUS.csv')
+str(data)
+```
+
+
+```{r}
+sum(is.na(data))
+colSums(is.na(data))
+```
+
+```{r}
+head(data)
+```
+
+```{r}
+library(dplyr)
+data <- select(data, -c(Evaporation, WindGustDir, WindDir9am, WindDir3pm, WindSpeed3pm, Humidity3pm, Pressure3pm, Cloud3pm, Temp3pm, RainToday, RainTomorrow))
+head(data)
+```
+
+```{r}
+library(lubridate)
+month('2008-12-01')
+data$year <- year(data$Date)
+head(data)
+```
+
+
+```{r}
+colSums(is.na(data))
+```
+
+```{r}
+data$Location <- as.factor(data$Location)
+str(data)
+```
+
+```{r}
+location_num <- as.numeric(data$Location)
+library(ggplot2)
+ggplot(data = data, mapping = aes(x = year)) + geom_boxplot()
+```
+
+
+
+#subset - Brisbane
+```{r}
+bris <- data %>%
+  filter(location_num == 8) 
+
+sum(is.na(bris))
+colSums(is.na(bris))
+```
+
+#take out the outliers 
+```{r}
+bris <- bris %>%
+  filter(WindGustSpeed < 75, WindSpeed9am < 30)
+
+summary(bris)
+head(bris)
+```
+
+
+```{r}
+minTB_median <-median(bris$MinTemp, na.rm = TRUE)
+bris$MinTemp[which(is.na(bris$MinTemp))] <- minTB_median
+
+maxTB_median <-median(bris$MaxTemp, na.rm = TRUE)
+bris$MaxTemp[which(is.na(bris$MaxTemp))] <- maxTB_median
+
+rainB_median <-median(bris$Rainfall, na.rm = TRUE)
+bris$Rainfall[which(is.na(bris$Rainfall))] <- rainB_median
+
+sunB_median <-median(bris$Sunshine, na.rm = TRUE)
+bris$Sunshine[which(is.na(bris$Sunshine))] <- sunB_median
+
+windGustB_median <-median(bris$WindGustSpeed, na.rm = TRUE)
+bris$WindGustSpeed[which(is.na(bris$WindGustSpeed))] <- windGustB_median
+
+speedB_median <-median(bris$WindSpeed9am, na.rm = TRUE)
+bris$WindSpeed9am[which(is.na(bris$WindSpeed9am))] <- speedB_median
+
+humB_median <-median(bris$Humidity9am, na.rm = TRUE)
+bris$Humidity9am[which(is.na(bris$Humidity9am))] <- humB_median
+
+pressB_median <-median(bris$Pressure9am, na.rm = TRUE)
+bris$Pressure9am[which(is.na(bris$Pressure9am))] <- pressB_median
+
+cloB_median <-median(bris$Cloud9am, na.rm = TRUE)
+bris$Cloud9am[which(is.na(bris$Cloud9am))] <- cloB_median
+
+tempB_median <-median(bris$Temp9am, na.rm = TRUE)
+bris$Temp9am[which(is.na(bris$Temp9am))] <- tempB_median
+colSums(is.na(bris))
+```
+
+```{r}
+summary(bris)
+```
+
+```{r}
+library(ggplot2)
+#positive correlation
+ggplot(data = bris, mapping = aes(x = MinTemp, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+
+ggplot(data = bris, mapping = aes(x = MaxTemp, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+ggplot(data = bris, mapping = aes(x = Sunshine, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+ggplot(data = bris, mapping = aes(x = WindGustSpeed, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#negative correlation
+ggplot(bris, aes(WindSpeed9am, Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#positive correlation
+ggplot(bris, aes(Humidity9am, Rainfall)) + geom_point()+ geom_smooth(method='lm')
+
+
+ggplot(bris, aes(Pressure9am, Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+ggplot(data = bris, mapping = aes(x = Cloud9am, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+ggplot(data = bris, mapping = aes(x = Temp9am, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+ggplot(data = bris, mapping = aes(x = year, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+```
+
+
+
+
+#subset - Darw
+```{r}
+darw <- data %>%
+  filter(location_num  == 14)
+
+sum(is.na(darw))
+colSums(is.na(darw))
+```
+
+```{r}
+minTD_median <- median(darw$MinTemp, na.rm = TRUE)
+darw$MinTemp[which(is.na(darw$MinTemp))] <-minTD_median 
+
+maxTD_median <- median(darw$MaxTemp, na.rm = TRUE)
+darw$MaxTemp[which(is.na(darw$MaxTemp))] <- maxTD_median
+
+sunD_median <- median(darw$Sunshine, na.rm = TRUE)
+darw$Sunshine[which(is.na(darw$Sunshine))] <-sunD_median
+
+windGustD_Median <- median(darw$WindGustSpeed, na.rm = TRUE)
+darw$WindGustSpeed[which(is.na(darw$WindGustSpeed))] <-windGustD_Median
+
+speedD_median <- median(darw$WindSpeed9am, na.rm = TRUE)
+darw$WindSpeed9am[which(is.na(darw$WindSpeed9am))] <-speedD_median
+
+humD_median <- median(darw$Humidity9am, na.rm = TRUE)
+darw$Humidity9am[which(is.na(darw$Humidity9am))] <- humD_median
+
+pressD_median <- median(darw$Pressure9am, na.rm = TRUE)
+darw$Pressure9am[which(is.na(darw$Pressure9am))] <- pressD_median
+
+cloD_median <- median(darw$Cloud9am, na.rm = TRUE)
+darw$Cloud9am[which(is.na(darw$Cloud9am))] <- cloD_median
+colSums(is.na(darw))
+```
+ 
+
+```{r}
+darw <- darw %>%
+  filter(WindGustSpeed < 110, WindSpeed9am < 50)
+
+summary(darw)
+```
+
+
+```{r}
+#negative correlation
+ggplot(data = darw, mapping = aes(x = MinTemp, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#negative correlation
+ggplot(data = darw, mapping = aes(x = MaxTemp, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#negative correlation
+ggplot(data = darw, mapping = aes(x = Sunshine, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#positive correlation
+ggplot(data = darw, mapping = aes(x = WindGustSpeed, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+ggplot(data = darw, mapping = aes(x = WindSpeed9am, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#positive correlation
+ggplot(data = darw, mapping = aes(x = Humidity9am, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#negative correlation
+ggplot(data = darw, mapping = aes(x = Pressure9am, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#positive correlation
+ggplot(data = darw, mapping = aes(x = Cloud9am, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+#negative correlation
+ggplot(data = darw, mapping = aes(x = Temp9am, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+
+ggplot(data = darw, mapping = aes(x = year, y = Rainfall)) + geom_point() + geom_smooth(method='lm')
+```
+
+
+
+
+#subset - MelA
+```{r}
+melA <- data %>%
+  filter(location_num  == 20)
+
+sum(is.na(melA))
+colSums(is.na(melA))
+```
+
+
+```{r}
+sunM_median <- median(melA$Sunshine, na.rm = TRUE)
+melA$Sunshine[which(is.na(melA$Sunshine))] <-sunM_median
+
+windGustM <- median(melA$WindGustSpeed, na.rm = TRUE)
+melA$WindGustSpeed[which(is.na(melA$WindGustSpeed))] <-windGustM
+
+speedM <- median(melA$WindSpeed9am, na.rm = TRUE)
+melA$WindSpeed9am[which(is.na(melA$WindSpeed9am))] <-speedM
+
+humM <- median(melA$Humidity9am, na.rm = TRUE)
+melA$Humidity9am[which(is.na(melA$Humidity9am))] <-humM
+
+colSums(is.na(melA))
+```
+
+```{r}
+summary(melA)
+```
+
+```{r}
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = MinTemp)) + geom_smooth(method='lm')
+
+#negative correlation
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = MaxTemp)) + geom_smooth(method='lm')
+
+#negative correlation
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = Sunshine)) + geom_smooth(method='lm')
+
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = WindGustSpeed)) + geom_smooth(method='lm')
+
+#negative correlation
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = WindSpeed9am)) + geom_smooth(method='lm')
+
+#positive correlation
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = Humidity9am)) + geom_smooth(method='lm')
+
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = Pressure9am)) + geom_smooth(method='lm')
+
+#positive correlation
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = Cloud9am)) + geom_smooth(method='lm')
+
+#negative correlation
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = Temp9am)) + geom_smooth(method='lm')
+
+ggplot( data = melA ) + geom_point(mapping =aes(y = Rainfall, x = year)) + geom_smooth(method='lm')
+```
+
+
+
+#model - linear regression
+```{r}
+lr_modelB <- lm(Rainfall~MinTemp+MaxTemp+Sunshine+WindGustSpeed+WindSpeed9am+Humidity9am+Pressure9am+Cloud9am+Temp9am+year, data=bris)
+
+plot(Rainfall~MinTemp+WindSpeed9am+Humidity9am+Pressure9am, bris)
+
+summary(lr_modelB)
+```
+#only 16% accuracy
+
+```{r}
+predictionB <- predict(lr_modelB, newdata = bris)
+rmseB <- sqrt(mean((predictionB-bris$Rainfall)^2))
+rmseB
+```
+
+
+
+
+```{r}
+lr_modelD <- lm(Rainfall~MinTemp+MaxTemp+Sunshine+WindGustSpeed+WindSpeed9am+Humidity9am+Pressure9am+Cloud9am+Temp9am+year, data=darw)
+
+plot(Rainfall~MinTemp+MaxTemp+Sunshine+WindGustSpeed+Humidity9am+Pressure9am+Temp9am, darw)
+
+summary(lr_modelD)
+```
+#only 33% accuracy
+
+```{r}
+predictionD <- predict(lr_modelD, newdata = darw)
+rmseD <- sqrt(mean((predictionD-darw$Rainfall)^2))
+rmseD
+```
+
+
+
+```{r}
+lr_modelM <- lm(Rainfall~MinTemp+MaxTemp+Sunshine+WindGustSpeed+WindSpeed9am+Humidity9am+Pressure9am+Cloud9am+Temp9am+year, data=melA)
+
+plot(Rainfall~+MaxTemp+Sunshine+WindSpeed9am+Humidity9am+Pressure9am+Temp9am, melA)
+
+summary(lr_modelM)
+```
+#only 14% accuracy
+
+```{r}
+predictionM <- predict(lr_modelM, newdata = melA)
+rmseM <- sqrt(mean((predictionM-melA$Rainfall)^2))
+rmseM
+```
+
